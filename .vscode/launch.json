@@ -1,0 +1,63 @@
+{
+    "version": "0.2.0",
+    "inputs": [
+        {
+            "id": "java-test-entry",
+            "type": "pickString",
+            "description": "Select Test Entry",
+            "default": "exqudens.example.util.StringUtilsUnitTests.*",
+            "options": [
+                "exqudens.example.util.StringUtilsUnitTests.*",
+                "exqudens.example.util.StringUtilsUnitTests.test_tokenize_1",
+                "exqudens.example.util.StringUtilsUnitTests.test_tokenize_2"
+            ]
+        }
+    ],
+    "configurations": [
+        {
+            "name": "main",
+            "type": "java",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "internalConsoleOptions": "openOnSessionStart",
+            "stopOnEntry": false,
+            "mainClass": "exqudens.example.Main"
+        },
+        {
+            "name": "test-discover",
+            "type": "java",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "internalConsoleOptions": "openOnSessionStart",
+            "stopOnEntry": false,
+            "classPaths": [
+                "$Test"
+            ],
+            "mainClass": "org.junit.platform.console.ConsoleLauncher",
+            "args": [
+                "discover",
+                "--scan-classpath"
+            ]
+        },
+        {
+            "name": "test-execute",
+            "type": "java",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "internalConsoleOptions": "openOnSessionStart",
+            "stopOnEntry": false,
+            "classPaths": [
+                "$Test"
+            ],
+            "mainClass": "org.junit.platform.console.ConsoleLauncher",
+            "args": [
+                "execute",
+                "--scan-class-path",
+                "--include-methodname=${input:java-test-entry}"
+            ]
+        }
+    ]
+}
