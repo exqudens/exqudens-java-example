@@ -13,19 +13,9 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <maven.compiler.release>17</maven.compiler.release>
+        <vscode.test.options>exqudens.example.StringUtilsUnitTests.*</vscode.test.options>
+        <vscode.test.default></vscode.test.default>
     </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.junit</groupId>
-                <artifactId>junit-bom</artifactId>
-                <version>6.0.3</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -36,11 +26,13 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
+            <version>5.14.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-console</artifactId>
+            <version>1.14.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -53,6 +45,24 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <classpathScope>test</classpathScope>
+                    <mainClass>exqudens.TestUtil</mainClass>
+                    <arguments>
+                        <argument>--command=discover</argument>
+                        <argument>--scan-class-path=${project.basedir}/target/classes</argument>
+                        <argument>--scan-class-path=${project.basedir}/target/test-classes</argument>
+                        <argument>--output-type=vscode-launch-json</argument>
+                        <argument>--template-default-key=${template-default-key}</argument>
+                        <argument>--template-options-val=${vscode.test.options}</argument>
+                        <argument>--template-default-val=${vscode.test.default}</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.5.4</version>

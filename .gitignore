@@ -1,7 +1,7 @@
 # Directories
 .idea/
 .settings/
-.vscode/*
+.vscode/
 out/
 target/
 build/
@@ -20,6 +20,3 @@ tmp/
 .flattened-pom.xml
 pom.xml.versionsBackup
 dependency-reduced-pom.xml
-
-# Not Files
-!.vscode/launch.json

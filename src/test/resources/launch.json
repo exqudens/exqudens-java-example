@@ -1,0 +1,45 @@
+{
+    "version": "0.2.0",
+    "inputs": [
+        {
+            "id": "java-test-entry",
+            "type": "pickString",
+            "description": "Select Test Entry",
+            "default": "${template-default-key}",
+            "options": [
+                "${template-options-key}"
+            ]
+        }
+    ],
+    "configurations": [
+        {
+            "name": "test",
+            "type": "java",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "internalConsoleOptions": "openOnSessionStart",
+            "stopOnEntry": false,
+            "classPaths": [
+                "$Test"
+            ],
+            "mainClass": "org.junit.platform.console.ConsoleLauncher",
+            "args": [
+                "execute",
+                "--scan-class-path=${workspaceFolder}/target/classes",
+                "--scan-class-path=${workspaceFolder}/target/test-classes",
+                "--include-methodname=${input:java-test-entry}"
+            ]
+        },
+        {
+            "name": "main",
+            "type": "java",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "internalConsoleOptions": "openOnSessionStart",
+            "stopOnEntry": false,
+            "mainClass": "exqudens.example.Main"
+        }
+    ]
+}

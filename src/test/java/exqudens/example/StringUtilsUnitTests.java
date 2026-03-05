@@ -1,4 +1,4 @@
-package exqudens.example.util;
+package exqudens.example;
 
 import java.util.List;
 
@@ -7,12 +7,14 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import exqudens.example.util.StringUtils;
+
 class StringUtilsUnitTests {
 
     private static final Logger logger = LoggerFactory.getLogger(StringUtilsUnitTests.class);
 
     @Test
-    void test_tokenize_1() {
+    public void test_tokenize_1() {
         List<String> expected = List.of("aaa", "bbb", "ccc");
         logger.info("expected: {}", expected);
 
@@ -23,7 +25,7 @@ class StringUtilsUnitTests {
     }
 
     @Test
-    void test_tokenize_2() {
+    public void test_tokenize_2() {
         List<String> expected = List.of("1", "2", "3");
         logger.info("expected: {}", expected);
 
