@@ -49,18 +49,40 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.2.0</version>
-                <configuration>
-                    <classpathScope>test</classpathScope>
-                    <mainClass>exqudens.TestUtil</mainClass>
-                    <arguments>
-                        <argument>--command=discover</argument>
-                        <argument>--scan-class-path=${project.basedir}/target/classes</argument>
-                        <argument>--scan-class-path=${project.basedir}/target/test-classes</argument>
-                        <argument>--output-type=vscode-launch-json</argument>
-                        <argument>--template-options-val=${vscode.test.options}</argument>
-                        <argument>--template-default-val=${vscode.test.default}</argument>
-                    </arguments>
-                </configuration>
+                <executions>
+                    <execution>
+                        <id>list</id>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <classpathScope>test</classpathScope>
+                            <mainClass>exqudens.TestUtil</mainClass>
+                            <arguments>
+                                <argument>--command=discover</argument>
+                                <argument>--scan-class-path=${project.basedir}/target/test-classes</argument>
+                                <argument>--output-type=stdout</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>vscode</id>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <classpathScope>test</classpathScope>
+                            <mainClass>exqudens.TestUtil</mainClass>
+                            <arguments>
+                                <argument>--command=discover</argument>
+                                <argument>--scan-class-path=${project.basedir}/target/test-classes</argument>
+                                <argument>--output-type=vscode-launch-json</argument>
+                                <argument>--template-options-val=${vscode.test.options}</argument>
+                                <argument>--template-default-val=${vscode.test.default}</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
