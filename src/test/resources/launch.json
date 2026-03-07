@@ -5,9 +5,9 @@
             "id": "java-test-entry",
             "type": "pickString",
             "description": "Select Test Entry",
-            "default": "${template-default-key}",
+            "default": "@template-default-key@",
             "options": [
-                "${template-options-key}"
+                "@template-options-key@"
             ]
         }
     ],

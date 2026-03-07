@@ -7,13 +7,16 @@ import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.platform.engine.discovery.DiscoverySelectors;
 import org.junit.platform.engine.support.descriptor.MethodSource;
@@ -37,15 +40,6 @@ public class TestUtil {
             .filter(v -> !v.isEmpty())
             .findFirst()
             .orElse("");
-        String templateOptionsVal = Arrays
-            .stream(args)
-            .filter(v -> v.startsWith("--template-options-val="))
-            .map(v -> split(v, "--template-options-val="))
-            .flatMap(List::stream)
-            .map(String::trim)
-            .filter(v -> !v.isEmpty())
-            .findFirst()
-            .orElse(null);
         if (command.equals("discover")) {
             List<String> result = new ArrayList<>();
             Set<Path> classPaths = Arrays
@@ -62,14 +56,16 @@ public class TestUtil {
             LauncherDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request().selectors(DiscoverySelectors.selectClasspathRoots(classPaths)).build();
             TestPlan plan = launcher.discover(request);
             Set<TestIdentifier> tests = plan.getRoots().stream().map(plan::getDescendants).flatMap(Set::stream).collect(Collectors.toCollection(LinkedHashSet::new));
-            List<String> ids = tests
+            Set<String> testIds = tests
                 .stream()
                 .map(TestIdentifier::getSource)
                 .flatMap(Optional::stream)
                 .filter(MethodSource.class::isInstance)
                 .map(MethodSource.class::cast)
-                .map(v -> format("{0}.{1}", v.getClassName(), v.getMethodName()))
-                .collect(Collectors.toCollection(ArrayList::new));
+                .map(v -> List.of(v.getClassName() + ".*", v.getClassName() + "." + v.getMethodName()))
+                .flatMap(List::stream)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+            List<String> ids = new ArrayList<>(testIds);
             result.add(format("-- ids.size: {0}", ids.size()));
             if (ids.isEmpty()) {
                 result.forEach(System.out::println);
@@ -87,11 +83,6 @@ public class TestUtil {
                 if (outputType.equals("stdout")) {
                     ids.forEach(System.out::println);
                 } else if (outputType.equals("vscode-launch-json")) {
-                    List<String> options = new ArrayList<>();
-                    if (templateOptionsVal != null) {
-                        split(templateOptionsVal, ",").stream().map(String::trim).filter(v -> !v.isEmpty()).forEach(options::add);
-                    }
-                    ids.stream().forEach(options::add);
                     Path output = Arrays
                         .stream(args)
                         .filter(v -> v.startsWith("--output="))
@@ -122,16 +113,7 @@ public class TestUtil {
                         .map(String::trim)
                         .filter(v -> !v.isEmpty())
                         .findFirst()
-                        .orElse("${template-options-key}");
-                    String templateDefaultVal = Arrays
-                        .stream(args)
-                        .filter(v -> v.startsWith("--template-default-val="))
-                        .map(v -> split(v, "--template-default-val="))
-                        .flatMap(List::stream)
-                        .map(String::trim)
-                        .filter(v -> !v.isEmpty())
-                        .findFirst()
-                        .orElse(options.get(0));
+                        .orElse("@template-options-key@");
                     String templateDefaultKey = Arrays
                         .stream(args)
                         .filter(v -> v.startsWith("--template-default-key="))
@@ -140,16 +122,39 @@ public class TestUtil {
                         .map(String::trim)
                         .filter(v -> !v.isEmpty())
                         .findFirst()
-                        .orElse(null);
+                        .orElse("@template-default-key@");
+                    String templateOptionsVal = Arrays
+                        .stream(args)
+                        .filter(v -> v.startsWith("--template-options-val="))
+                        .map(v -> split(v, "--template-options-val="))
+                        .flatMap(List::stream)
+                        .map(String::trim)
+                        .filter(v -> !v.isEmpty())
+                        .findFirst()
+                        .orElse("");
+                    String templateDefaultVal = Arrays
+                        .stream(args)
+                        .filter(v -> v.startsWith("--template-default-val="))
+                        .map(v -> split(v, "--template-default-val="))
+                        .flatMap(List::stream)
+                        .map(String::trim)
+                        .filter(v -> !v.isEmpty())
+                        .findFirst()
+                        .orElse("");
 
                     String separatorForOptions = "\"," + System.lineSeparator() + "                \"";
 
-                    String outpuString = Files.readString(template, StandardCharsets.UTF_8);
-                    outpuString = outpuString.replace(templateOptionsKey, String.join(separatorForOptions, options));
+                    List<String> options = Stream
+                        .concat(
+                            split(templateOptionsVal, ",").stream().map(String::trim).filter(v -> !v.isEmpty()),
+                            ids.stream()
+                        ).collect(Collectors.toCollection(ArrayList::new));
+                    String optionsValue = String.join(separatorForOptions, options);
+                    String defaultValue = templateDefaultVal.isEmpty() ? options.get(0) : templateDefaultVal;
 
-                    if (templateDefaultKey != null) {
-                        outpuString = outpuString.replace(templateDefaultKey, templateDefaultVal);
-                    }
+                    String outpuString = Files.readString(template, StandardCharsets.UTF_8);
+                    outpuString = outpuString.replace(templateOptionsKey, String.join(separatorForOptions, optionsValue));
+                    outpuString = outpuString.replace(templateDefaultKey, defaultValue);
 
                     Files.createDirectories(output.getParent());
                     Files.writeString(output, outpuString, StandardCharsets.UTF_8);
@@ -174,14 +179,27 @@ public class TestUtil {
     }
 
     public static List<String> split(String value, String separator) {
+        List<String> result = null;
         if (value == null) {
-            return null;
+            return result;
         }
         if (separator == null) {
-            return value.chars().mapToObj(c -> String.valueOf((char) c)).collect(Collectors.toCollection(ArrayList::new));
-        } else {
-            return Arrays.stream(value.split(Pattern.quote(separator))).collect(Collectors.toCollection(ArrayList::new));
+            result = value.chars().mapToObj(c -> String.valueOf((char) c)).collect(Collectors.toCollection(ArrayList::new));
+            return result;
         }
+        if (!value.contains(separator)) {
+            result = Arrays.asList(value);
+            return result;
+        }
+        result = new ArrayList<>();
+        int start = 0;
+        int end;
+        while ((end = value.indexOf(separator, start)) != -1) {
+            result.add(value.substring(start, end));
+            start = end + separator.length();
+        }
+        result.add(value.substring(start));
+        return result;
     }
 
 }
