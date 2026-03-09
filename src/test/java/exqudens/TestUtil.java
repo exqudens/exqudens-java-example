@@ -142,7 +142,7 @@ public class TestUtil {
                         .findFirst()
                         .orElse("");
 
-                    String separatorForOptions = "\"," + System.lineSeparator() + "                \"";
+                    String separatorForOptions = "\"," + System.lineSeparator() + "                    \"";
 
                     List<String> options = Stream
                         .concat(

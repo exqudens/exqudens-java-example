@@ -14,7 +14,6 @@
         <maven.compiler.target>17</maven.compiler.target>
         <maven.compiler.release>17</maven.compiler.release>
         <vscode.test.options></vscode.test.options>
-        <vscode.test.default></vscode.test.default>
     </properties>
 
     <dependencies>
@@ -78,7 +77,6 @@
                                 <argument>--scan-class-path=${project.basedir}/target/test-classes</argument>
                                 <argument>--output-type=vscode-launch-json</argument>
                                 <argument>--template-options-val=${vscode.test.options}</argument>
-                                <argument>--template-default-val=${vscode.test.default}</argument>
                             </arguments>
                         </configuration>
                     </execution>

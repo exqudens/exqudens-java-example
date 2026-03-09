@@ -3,12 +3,16 @@
     "inputs": [
         {
             "id": "java-test-entry",
-            "type": "pickString",
-            "description": "Select Test Entry",
-            "default": "@template-default-key@",
-            "options": [
-                "@template-options-key@"
-            ]
+            "type": "command",
+            "command": "extension.commandvariable.pickStringRemember",
+            "args": {
+                "key": "java-test-entry",
+                "addLabelToTop": "${remember:java-test-entry}",
+                "description": "Select Test Entry",
+                "options": [
+                    "@template-options-key@"
+                ]
+            }
         }
     ],
     "configurations": [
