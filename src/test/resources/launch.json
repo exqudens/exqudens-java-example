@@ -43,7 +43,7 @@
             "console": "internalConsole",
             "internalConsoleOptions": "openOnSessionStart",
             "stopOnEntry": false,
-            "mainClass": "exqudens.example.Main"
+            "mainClass": "exqudens.example.Application"
         }
     ]
 }
